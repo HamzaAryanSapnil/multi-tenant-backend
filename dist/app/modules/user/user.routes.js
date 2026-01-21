@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.userRoutes = void 0;
+const express_1 = __importDefault(require("express"));
+const client_1 = require("@prisma/client");
+const auth_1 = __importDefault(require("../../middlewares/auth"));
+const validateRequest_1 = __importDefault(require("../../middlewares/validateRequest"));
+const user_controller_1 = require("./user.controller");
+const user_validation_1 = require("./user.validation");
+const router = express_1.default.Router();
+router.post("/", (0, auth_1.default)(client_1.UserRole.PLATFORM_ADMIN, client_1.UserRole.ORGANIZATION_ADMIN), (0, validateRequest_1.default)(user_validation_1.UserValidation.createUserValidationSchema), user_controller_1.UserController.create);
+router.get("/", (0, auth_1.default)(client_1.UserRole.PLATFORM_ADMIN, client_1.UserRole.ORGANIZATION_ADMIN), user_controller_1.UserController.getAllFromDB);
+router.get("/me", (0, auth_1.default)(client_1.UserRole.PLATFORM_ADMIN, client_1.UserRole.ORGANIZATION_ADMIN, client_1.UserRole.ORGANIZATION_MEMBER), user_controller_1.UserController.getMe);
+router.get("/:id", (0, auth_1.default)(client_1.UserRole.PLATFORM_ADMIN, client_1.UserRole.ORGANIZATION_ADMIN, client_1.UserRole.ORGANIZATION_MEMBER), user_controller_1.UserController.getByIdFromDB);
+router.patch("/:id", (0, auth_1.default)(client_1.UserRole.PLATFORM_ADMIN, client_1.UserRole.ORGANIZATION_ADMIN, client_1.UserRole.ORGANIZATION_MEMBER), (0, validateRequest_1.default)(user_validation_1.UserValidation.updateUserValidationSchema), user_controller_1.UserController.updateIntoDB);
+router.delete("/:id", (0, auth_1.default)(client_1.UserRole.PLATFORM_ADMIN, client_1.UserRole.ORGANIZATION_ADMIN), user_controller_1.UserController.deleteFromDB);
+exports.userRoutes = router;

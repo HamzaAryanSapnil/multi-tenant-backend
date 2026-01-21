@@ -1,4 +1,3 @@
-import { UserStatus } from "@prisma/client";
 import { prisma } from "../../shared/prisma";
 import bcrypt from "bcryptjs";
 import { Secret } from "jsonwebtoken";
@@ -21,14 +20,21 @@ const login = async (payload: { email: string; password: string }) => {
     throw new ApiError(httpStatus.BAD_REQUEST, "Password is incorrect!");
   }
 
+  const jwtPayload = {
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    organizationId: user.organizationId,
+  };
+
   const accessToken = jwtHelper.generateToken(
-    { email: user.email, role: user.role },
+    jwtPayload,
     config.jwt.jwt_secret as Secret,
     "1h",
   );
 
   const refreshToken = jwtHelper.generateToken(
-    { email: user.email, role: user.role },
+    jwtPayload,
     config.jwt.refresh_token_secret as Secret,
     "90d",
   );
@@ -48,7 +54,7 @@ const getMe = async (session: any) => {
 
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
-      email: decodedData.email
+      email: decodedData.email,
     },
   });
 
@@ -58,7 +64,7 @@ const getMe = async (session: any) => {
     id,
     email,
     role,
-    organizationId
+    organizationId,
   };
 };
 

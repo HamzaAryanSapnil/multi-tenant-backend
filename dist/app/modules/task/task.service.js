@@ -11,11 +11,9 @@ const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const paginationHelper_1 = require("../../helper/paginationHelper");
 const task_constant_1 = require("./task.constant");
 const create = async (user, payload) => {
-    // Only Org Admin and Platform Admin can create tasks
     if (user.role === client_1.UserRole.ORGANIZATION_MEMBER) {
         throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Members cannot create tasks!");
     }
-    // Verify project exists and belongs to user's org (if not Platform Admin)
     const project = await prisma_1.prisma.project.findUniqueOrThrow({
         where: { id: payload.projectId },
     });
@@ -47,7 +45,6 @@ const getAllFromDB = async (user, filters, options) => {
     const { page, limit, skip, sortBy, sortOrder } = paginationHelper_1.paginationHelper.calculatePagination(options);
     const { searchTerm, ...filterData } = filters;
     const andConditions = [];
-    // For Members: show only assigned tasks
     if (user.role === client_1.UserRole.ORGANIZATION_MEMBER) {
         andConditions.push({
             assignments: {
@@ -57,7 +54,6 @@ const getAllFromDB = async (user, filters, options) => {
             },
         });
     }
-    // For Org Admin: show tasks in their org only
     if (user.role === client_1.UserRole.ORGANIZATION_ADMIN) {
         if (!user.organizationId) {
             throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "You must belong to an organization!");
@@ -68,8 +64,6 @@ const getAllFromDB = async (user, filters, options) => {
             },
         });
     }
-    // Platform Admin sees all tasks (no filter)
-    // Search
     if (searchTerm) {
         andConditions.push({
             OR: task_constant_1.taskSearchableFields.map((field) => ({
@@ -80,7 +74,6 @@ const getAllFromDB = async (user, filters, options) => {
             })),
         });
     }
-    // Filters
     if (Object.keys(filterData).length > 0) {
         andConditions.push({
             AND: Object.keys(filterData).map((key) => ({
@@ -158,21 +151,17 @@ const getByIdFromDB = async (user, id) => {
             },
         },
     });
-    // Access control
     if (user.role === client_1.UserRole.ORGANIZATION_MEMBER) {
-        // Member can only see assigned tasks
         const isAssigned = task.assignments.some((a) => a.userId === user.userId);
         if (!isAssigned) {
             throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "You can only view tasks assigned to you!");
         }
     }
     else if (user.role === client_1.UserRole.ORGANIZATION_ADMIN) {
-        // Org Admin can only see tasks in their org
         if (task.project.organizationId !== user.organizationId) {
             throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "You can only view tasks in your organization!");
         }
     }
-    // Platform Admin can see all
     return task;
 };
 const updateIntoDB = async (user, id, payload) => {
@@ -183,7 +172,6 @@ const updateIntoDB = async (user, id, payload) => {
             assignments: true,
         },
     });
-    // Access control
     if (user.role === client_1.UserRole.ORGANIZATION_MEMBER) {
         throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Members cannot update tasks!");
     }
@@ -224,7 +212,6 @@ const deleteFromDB = async (user, id) => {
             project: true,
         },
     });
-    // Access control
     if (user.role === client_1.UserRole.ORGANIZATION_MEMBER) {
         throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Members cannot delete tasks!");
     }
@@ -238,7 +225,6 @@ const deleteFromDB = async (user, id) => {
     });
 };
 const assignTask = async (user, taskId, userId) => {
-    // Only Org Admin and Platform Admin can assign tasks
     if (user.role === client_1.UserRole.ORGANIZATION_MEMBER) {
         throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Members cannot assign tasks!");
     }
@@ -248,11 +234,9 @@ const assignTask = async (user, taskId, userId) => {
             project: true,
         },
     });
-    // Verify user exists and belongs to same org
     const targetUser = await prisma_1.prisma.user.findUniqueOrThrow({
         where: { id: userId },
     });
-    // Org scoping check
     if (user.role === client_1.UserRole.ORGANIZATION_ADMIN) {
         if (task.project.organizationId !== user.organizationId) {
             throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "You can only assign tasks in your organization!");
@@ -261,7 +245,6 @@ const assignTask = async (user, taskId, userId) => {
             throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "You can only assign tasks to users in your organization!");
         }
     }
-    // Check if already assigned
     const existing = await prisma_1.prisma.taskAssignment.findFirst({
         where: {
             taskId,
@@ -296,7 +279,6 @@ const assignTask = async (user, taskId, userId) => {
     return assignment;
 };
 const unassignTask = async (user, taskId, userId) => {
-    // Only Org Admin and Platform Admin can unassign tasks
     if (user.role === client_1.UserRole.ORGANIZATION_MEMBER) {
         throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Members cannot unassign tasks!");
     }
@@ -306,7 +288,6 @@ const unassignTask = async (user, taskId, userId) => {
             project: true,
         },
     });
-    // Org scoping check
     if (user.role === client_1.UserRole.ORGANIZATION_ADMIN) {
         if (task.project.organizationId !== user.organizationId) {
             throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "You can only unassign tasks in your organization!");

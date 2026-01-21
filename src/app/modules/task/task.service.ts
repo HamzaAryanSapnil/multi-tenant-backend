@@ -16,7 +16,6 @@ const create = async (
     projectId: string;
   },
 ): Promise<Task> => {
-  // Only Org Admin and Platform Admin can create tasks
   if (user.role === UserRole.ORGANIZATION_MEMBER) {
     throw new ApiError(
       httpStatus.FORBIDDEN,
@@ -24,7 +23,6 @@ const create = async (
     );
   }
 
-  // Verify project exists and belongs to user's org (if not Platform Admin)
   const project = await prisma.project.findUniqueOrThrow({
     where: { id: payload.projectId },
   });
@@ -70,7 +68,6 @@ const getAllFromDB = async (
 
   const andConditions: Prisma.TaskWhereInput[] = [];
 
-  // For Members: show only assigned tasks
   if (user.role === UserRole.ORGANIZATION_MEMBER) {
     andConditions.push({
       assignments: {
@@ -81,7 +78,6 @@ const getAllFromDB = async (
     });
   }
 
-  // For Org Admin: show tasks in their org only
   if (user.role === UserRole.ORGANIZATION_ADMIN) {
     if (!user.organizationId) {
       throw new ApiError(
@@ -96,9 +92,7 @@ const getAllFromDB = async (
     });
   }
 
-  // Platform Admin sees all tasks (no filter)
 
-  // Search
   if (searchTerm) {
     andConditions.push({
       OR: taskSearchableFields.map((field) => ({
@@ -110,7 +104,6 @@ const getAllFromDB = async (
     });
   }
 
-  // Filters
   if (Object.keys(filterData).length > 0) {
     andConditions.push({
       AND: Object.keys(filterData).map((key) => ({
@@ -195,9 +188,7 @@ const getByIdFromDB = async (user: IJwtPayload, id: string): Promise<Task> => {
     },
   });
 
-  // Access control
   if (user.role === UserRole.ORGANIZATION_MEMBER) {
-    // Member can only see assigned tasks
     const isAssigned = task.assignments.some((a) => a.userId === user.userId);
     if (!isAssigned) {
       throw new ApiError(
@@ -206,7 +197,6 @@ const getByIdFromDB = async (user: IJwtPayload, id: string): Promise<Task> => {
       );
     }
   } else if (user.role === UserRole.ORGANIZATION_ADMIN) {
-    // Org Admin can only see tasks in their org
     if (task.project.organizationId !== user.organizationId) {
       throw new ApiError(
         httpStatus.FORBIDDEN,
@@ -214,7 +204,6 @@ const getByIdFromDB = async (user: IJwtPayload, id: string): Promise<Task> => {
       );
     }
   }
-  // Platform Admin can see all
 
   return task;
 };
@@ -232,7 +221,6 @@ const updateIntoDB = async (
     },
   });
 
-  // Access control
   if (user.role === UserRole.ORGANIZATION_MEMBER) {
     throw new ApiError(
       httpStatus.FORBIDDEN,
@@ -283,7 +271,6 @@ const deleteFromDB = async (user: IJwtPayload, id: string): Promise<Task> => {
     },
   });
 
-  // Access control
   if (user.role === UserRole.ORGANIZATION_MEMBER) {
     throw new ApiError(
       httpStatus.FORBIDDEN,
@@ -310,7 +297,6 @@ const assignTask = async (
   taskId: string,
   userId: string,
 ) => {
-  // Only Org Admin and Platform Admin can assign tasks
   if (user.role === UserRole.ORGANIZATION_MEMBER) {
     throw new ApiError(
       httpStatus.FORBIDDEN,
@@ -325,12 +311,11 @@ const assignTask = async (
     },
   });
 
-  // Verify user exists and belongs to same org
+ 
   const targetUser = await prisma.user.findUniqueOrThrow({
     where: { id: userId },
   });
 
-  // Org scoping check
   if (user.role === UserRole.ORGANIZATION_ADMIN) {
     if (task.project.organizationId !== user.organizationId) {
       throw new ApiError(
@@ -346,7 +331,6 @@ const assignTask = async (
     }
   }
 
-  // Check if already assigned
   const existing = await prisma.taskAssignment.findFirst({
     where: {
       taskId,
@@ -392,7 +376,6 @@ const unassignTask = async (
   taskId: string,
   userId: string,
 ) => {
-  // Only Org Admin and Platform Admin can unassign tasks
   if (user.role === UserRole.ORGANIZATION_MEMBER) {
     throw new ApiError(
       httpStatus.FORBIDDEN,
@@ -407,7 +390,6 @@ const unassignTask = async (
     },
   });
 
-  // Org scoping check
   if (user.role === UserRole.ORGANIZATION_ADMIN) {
     if (task.project.organizationId !== user.organizationId) {
       throw new ApiError(

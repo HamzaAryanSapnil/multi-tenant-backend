@@ -4,6 +4,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../shared/catchAsync";
 import sendResponse from "../../shared/sendResponse";
 import pick from "../../helper/pick";
+import ApiError from "../../errors/ApiError";
 import { IJwtPayload } from "../../types/common";
 import { UserService } from "./user.service";
 import { userFilterableFields } from "./user.constant";
@@ -57,6 +58,10 @@ const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateIntoDB = catchAsync(async (req: Request, res: Response) => {
+  if (!req.user) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Authentication required");
+  }
+
   const result = await UserService.updateIntoDB(
     req.user as IJwtPayload,
     req.params.id as string,

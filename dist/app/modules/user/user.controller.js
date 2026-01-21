@@ -8,6 +8,7 @@ const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../shared/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../shared/sendResponse"));
 const pick_1 = __importDefault(require("../../helper/pick"));
+const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const user_service_1 = require("./user.service");
 const user_constant_1 = require("./user.constant");
 const create = (0, catchAsync_1.default)(async (req, res) => {
@@ -50,6 +51,9 @@ const getByIdFromDB = (0, catchAsync_1.default)(async (req, res) => {
     });
 });
 const updateIntoDB = (0, catchAsync_1.default)(async (req, res) => {
+    if (!req.user) {
+        throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "Authentication required");
+    }
     const result = await user_service_1.UserService.updateIntoDB(req.user, req.params.id, req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,

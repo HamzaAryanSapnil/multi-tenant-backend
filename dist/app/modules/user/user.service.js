@@ -78,7 +78,12 @@ const getAllFromDB = async (authUser, params, options) => {
             email: true,
             name: true,
             role: true,
-            organizationId: true,
+            organization: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
             createdAt: true,
             updatedAt: true,
         },
@@ -94,7 +99,6 @@ const getMe = async (authUser) => {
             email: true,
             name: true,
             role: true,
-            organizationId: true,
             createdAt: true,
             updatedAt: true,
             organization: {
@@ -122,7 +126,12 @@ const getByIdFromDB = async (authUser, id) => {
             email: true,
             name: true,
             role: true,
-            organizationId: true,
+            organization: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
             createdAt: true,
             updatedAt: true,
         },
@@ -130,27 +139,38 @@ const getByIdFromDB = async (authUser, id) => {
     if (!user) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "User not found");
     }
-    if (!isPlatformAdmin && isOrgAdmin && user.organizationId !== authUser.organizationId) {
+    if (!isPlatformAdmin && isOrgAdmin && user.organization?.id !== authUser.organizationId) {
         throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Forbidden!");
     }
     return user;
 };
 const updateIntoDB = async (authUser, id, payload) => {
+    if (!authUser || !authUser.role) {
+        throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "Authentication required");
+    }
     const isPlatformAdmin = authUser.role === client_1.UserRole.PLATFORM_ADMIN;
     const isOrgAdmin = authUser.role === client_1.UserRole.ORGANIZATION_ADMIN;
     const isMember = authUser.role === client_1.UserRole.ORGANIZATION_MEMBER;
     if (isMember && authUser.userId !== id) {
         throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Forbidden!");
     }
-    const existing = await prisma_1.prisma.user.findUnique({ where: { id } });
+    const existing = await prisma_1.prisma.user.findUnique({
+        where: { id },
+        select: {
+            id: true,
+            organizationId: true,
+            role: true,
+        },
+    });
     if (!existing)
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "User not found");
-    // org admin can only update within org, and cannot promote to platform admin or change orgId
     if (!isPlatformAdmin && isOrgAdmin) {
-        if (existing.organizationId !== authUser.organizationId) {
+        const existingOrgId = existing.organizationId ?? null;
+        const authOrgId = authUser.organizationId ?? null;
+        if (existingOrgId !== authOrgId) {
             throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Forbidden!");
         }
-        if (payload.organizationId && payload.organizationId !== existing.organizationId) {
+        if (payload.organizationId && payload.organizationId !== existingOrgId) {
             throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Org admin cannot change organizationId");
         }
         if (payload.role === client_1.UserRole.PLATFORM_ADMIN) {
@@ -167,27 +187,38 @@ const updateIntoDB = async (authUser, id, payload) => {
                 email: true,
                 name: true,
                 role: true,
-                organizationId: true,
                 createdAt: true,
                 updatedAt: true,
+                organization: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
             },
         });
     }
+    const existingOrgId = existing.organizationId ?? null;
     return prisma_1.prisma.user.update({
         where: { id },
         data: {
             name: payload.name,
             role: payload.role,
-            organizationId: isPlatformAdmin ? payload.organizationId ?? existing.organizationId : existing.organizationId,
+            organizationId: isPlatformAdmin ? payload.organizationId ?? existingOrgId : existingOrgId,
         },
         select: {
             id: true,
             email: true,
             name: true,
             role: true,
-            organizationId: true,
             createdAt: true,
             updatedAt: true,
+            organization: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
         },
     });
 };
@@ -197,11 +228,21 @@ const deleteFromDB = async (authUser, id) => {
     if (!isPlatformAdmin && !isOrgAdmin) {
         throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Forbidden!");
     }
-    const existing = await prisma_1.prisma.user.findUnique({ where: { id } });
+    const existing = await prisma_1.prisma.user.findUnique({
+        where: { id },
+        select: {
+            id: true,
+            organizationId: true,
+        },
+    });
     if (!existing)
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "User not found");
-    if (!isPlatformAdmin && existing.organizationId !== authUser.organizationId) {
-        throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Forbidden!");
+    if (!isPlatformAdmin) {
+        const existingOrgId = existing.organizationId ?? null;
+        const authOrgId = authUser.organizationId ?? null;
+        if (existingOrgId !== authOrgId) {
+            throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Forbidden!");
+        }
     }
     // hard delete to keep schema minimal
     return prisma_1.prisma.user.delete({

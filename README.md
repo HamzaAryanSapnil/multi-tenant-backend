@@ -403,7 +403,7 @@ MIT
 
 ## 👨‍💻 Author
 
-[Your Name]
+Hamza Aryan Sapnil
 
 ---
 

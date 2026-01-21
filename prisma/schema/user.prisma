@@ -1,0 +1,20 @@
+// User related models
+
+model User {
+  id             String  @id @default(uuid())
+  email          String  @unique
+  password       String
+  name           String?
+  role           UserRole @default(ORGANIZATION_MEMBER)
+  organizationId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  taskAssignments TaskAssignment[]
+
+  @@index([organizationId])
+  @@map("users")
+}

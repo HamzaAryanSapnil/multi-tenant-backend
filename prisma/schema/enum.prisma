@@ -1,0 +1,20 @@
+// Enums for the application
+
+enum UserRole {
+  PLATFORM_ADMIN
+  ORGANIZATION_ADMIN
+  ORGANIZATION_MEMBER
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+  DELETED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}

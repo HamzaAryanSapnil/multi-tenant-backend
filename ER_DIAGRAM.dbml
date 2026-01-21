@@ -1,0 +1,95 @@
+// Use this on https://dbdiagram.io to generate ER Diagram
+// Multi-Tenant Organization Workspace API - Database Schema
+
+Table organizations {
+  id uuid [primary key, default: `uuid_generate_v4()`]
+  name varchar [unique, not null]
+  description text
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+  
+  Note: 'Stores organizations created by Platform Admins'
+}
+
+Table users {
+  id uuid [primary key, default: `uuid_generate_v4()`]
+  email varchar [unique, not null]
+  password varchar [not null, note: 'Hashed with bcrypt']
+  name varchar
+  role user_role [not null, default: 'ORGANIZATION_MEMBER']
+  organizationId uuid [ref: > organizations.id, note: 'Nullable for Platform Admins']
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+  
+  indexes {
+    organizationId
+    email
+  }
+  
+  Note: 'Stores users with roles and org affiliation. Platform Admins may have null organizationId'
+}
+
+Table projects {
+  id uuid [primary key, default: `uuid_generate_v4()`]
+  name varchar [not null]
+  description text
+  organizationId uuid [ref: > organizations.id, not null]
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+  
+  indexes {
+    (name, organizationId) [unique, note: 'Unique project name per organization']
+    organizationId
+  }
+  
+  Note: 'Projects belong strictly to one organization'
+}
+
+Table tasks {
+  id uuid [primary key, default: `uuid_generate_v4()`]
+  title varchar [not null]
+  description text
+  status task_status [not null, default: 'TODO']
+  projectId uuid [ref: > projects.id, not null]
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
+  
+  indexes {
+    projectId
+  }
+  
+  Note: 'Tasks belong to projects (and thus organizations through projects)'
+}
+
+Table task_assignments {
+  id uuid [primary key, default: `uuid_generate_v4()`]
+  taskId uuid [ref: > tasks.id, not null]
+  userId uuid [ref: > users.id, not null]
+  assignedAt timestamp [default: `now()`]
+  
+  indexes {
+    (taskId, userId) [unique, note: 'A user can be assigned to a task only once']
+  }
+  
+  Note: 'Junction table for many-to-many user-task assignments. Members only see assigned tasks'
+}
+
+// Enums
+Enum user_role {
+  PLATFORM_ADMIN
+  ORGANIZATION_ADMIN
+  ORGANIZATION_MEMBER
+}
+
+Enum task_status {
+  TODO
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+// Relationships (already defined via ref above, but documented here for clarity)
+// Organization (1) -> (N) Users
+// Organization (1) -> (N) Projects
+// Project (1) -> (N) Tasks
+// User (M) <-> (N) Tasks (via task_assignments junction table)

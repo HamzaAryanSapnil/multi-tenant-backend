@@ -1,0 +1,754 @@
+{
+  "info": {
+    "name": "Multi-Tenant Organization Workspace API",
+    "description": "Complete API collection for Multi-Tenant Workspace System with JWT cookie-based authentication",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login - Platform Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Cookies are automatically handled by Postman"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"platform@admin.com\",\n  \"password\": \"Pass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login with Platform Admin credentials. Access token will be stored in cookies."
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Org Admin (Org 1)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@org1.com\",\n  \"password\": \"Pass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login with Organization 1 Admin credentials"
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Member (Org 1)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"member@org1.com\",\n  \"password\": \"Pass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login with Organization 1 Member credentials"
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get current authenticated user's profile (requires authentication)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication endpoints for login and profile retrieval"
+    },
+    {
+      "name": "Organizations (Platform Admin Only)",
+      "item": [
+        {
+          "name": "Create Organization",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Corporation\",\n  \"description\": \"Leading technology company\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/organizations",
+              "host": ["{{baseUrl}}"],
+              "path": ["organizations"]
+            },
+            "description": "Create a new organization (Platform Admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Organizations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations?page=1&limit=10&sortBy=createdAt&sortOrder=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["organizations"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc"
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List all organizations with pagination (Platform Admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Organization by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["organizations", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "org-uuid-here"
+                }
+              ]
+            },
+            "description": "Get specific organization details (Platform Admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Organization",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Organization Name\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/organizations/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["organizations", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "org-uuid-here"
+                }
+              ]
+            },
+            "description": "Update organization details (Platform Admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Organization",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/organizations/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["organizations", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "org-uuid-here"
+                }
+              ]
+            },
+            "description": "Delete organization (Platform Admin only)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Organization management endpoints (Platform Admin only)"
+    },
+    {
+      "name": "Users (Org-Scoped)",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@org1.com\",\n  \"password\": \"Pass123!\",\n  \"name\": \"John Doe\",\n  \"role\": \"ORGANIZATION_MEMBER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Create user in organization (Org Admin/Platform Admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users?page=1&limit=10&sortBy=createdAt&sortOrder=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc"
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "role",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List users (org-scoped for Org Admin, all for Platform Admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me"]
+            },
+            "description": "Get own user profile"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user-uuid-here"
+                }
+              ]
+            },
+            "description": "Get user details (org-scoped)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"role\": \"ORGANIZATION_ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user-uuid-here"
+                }
+              ]
+            },
+            "description": "Update user details (org-scoped, role restrictions apply)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user-uuid-here"
+                }
+              ]
+            },
+            "description": "Delete user (org-scoped)"
+          },
+          "response": []
+        }
+      ],
+      "description": "User management endpoints with organization scoping"
+    },
+    {
+      "name": "Projects (Org-Scoped)",
+      "item": [
+        {
+          "name": "Create Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Website Redesign\",\n  \"description\": \"Complete redesign of company website\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects"]
+            },
+            "description": "Create project in organization (Org Admin/Platform Admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects?page=1&limit=10&sortBy=createdAt&sortOrder=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc"
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List projects (org-scoped for non-Platform users)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Project by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "project-uuid-here"
+                }
+              ]
+            },
+            "description": "Get project details (org-scoped)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Project Name\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "project-uuid-here"
+                }
+              ]
+            },
+            "description": "Update project (Org Admin/Platform Admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Project",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "project-uuid-here"
+                }
+              ]
+            },
+            "description": "Delete project (Org Admin/Platform Admin)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Project management endpoints with organization scoping"
+    },
+    {
+      "name": "Tasks (Org-Scoped + Assignments)",
+      "item": [
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Design homepage mockup\",\n  \"description\": \"Create high-fidelity mockup for new homepage\",\n  \"status\": \"TODO\",\n  \"projectId\": \"project-uuid-here\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks"]
+            },
+            "description": "Create task under a project (Org Admin/Platform Admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks?page=1&limit=10&sortBy=createdAt&sortOrder=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc"
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List tasks (Org Admin: all in org, Member: only assigned tasks)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Task by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "task-uuid-here"
+                }
+              ]
+            },
+            "description": "Get task details (access control: org-scoped, member must be assigned)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated task title\",\n  \"description\": \"Updated description\",\n  \"status\": \"IN_PROGRESS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "task-uuid-here"
+                }
+              ]
+            },
+            "description": "Update task (Org Admin/Platform Admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "task-uuid-here"
+                }
+              ]
+            },
+            "description": "Delete task (Org Admin/Platform Admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Task to User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-uuid-here\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:id/assign",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", ":id", "assign"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "task-uuid-here"
+                }
+              ]
+            },
+            "description": "Assign task to user in same organization (Org Admin/Platform Admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Unassign Task from User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:id/assign/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", ":id", "assign", ":userId"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "task-uuid-here"
+                },
+                {
+                  "key": "userId",
+                  "value": "user-uuid-here"
+                }
+              ]
+            },
+            "description": "Unassign task from user (Org Admin/Platform Admin)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Task management endpoints with organization scoping and assignment logic"
+    }
+  ],
+  "auth": {
+    "type": "noauth"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Cookies are automatically managed by Postman",
+          "// Make sure 'Automatically follow redirects' and",
+          "// 'Send cookies with requests' are enabled in Postman settings"
+        ]
+      }
+    }
+  ]
+}

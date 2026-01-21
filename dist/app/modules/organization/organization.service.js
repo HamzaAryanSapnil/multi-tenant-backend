@@ -65,7 +65,6 @@ const updateIntoDB = async (id, payload) => {
 };
 const deleteFromDB = async (id) => {
     await getByIdFromDB(id);
-    // Hard delete; if you want soft delete later, add isDeleted field in schema.
     return prisma_1.prisma.organization.delete({
         where: { id },
     });

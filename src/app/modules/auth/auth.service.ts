@@ -39,11 +39,34 @@ const login = async (payload: { email: string; password: string }) => {
   };
 };
 
+const getMe = async (session: any) => {
+  const accessToken = session.accessToken;
+  const decodedData = jwtHelper.verifyToken(
+    accessToken,
+    config.jwt.jwt_secret as Secret,
+  );
+
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: decodedData.email
+    },
+  });
+
+  const { id, email, role, organizationId } = userData;
+
+  return {
+    id,
+    email,
+    role,
+    organizationId
+  };
+};
+
 export const AuthService = {
   login,
 //   changePassword,
 //   forgotPassword,
 //   refreshToken,
 //   resetPassword,
-//   getMe,
+  getMe,
 };

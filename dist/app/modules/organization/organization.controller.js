@@ -11,6 +11,7 @@ const pick_1 = __importDefault(require("../../helper/pick"));
 const organization_service_1 = require("./organization.service");
 const organization_constant_1 = require("./organization.constant");
 const create = (0, catchAsync_1.default)(async (req, res) => {
+    console.log("req.body", req.body);
     const result = await organization_service_1.OrganizationService.create(req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,

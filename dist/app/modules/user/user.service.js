@@ -148,6 +148,9 @@ const updateIntoDB = async (authUser, id, payload) => {
     if (!authUser || !authUser.role) {
         throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "Authentication required");
     }
+    if (!payload) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "Request body is required");
+    }
     const isPlatformAdmin = authUser.role === client_1.UserRole.PLATFORM_ADMIN;
     const isOrgAdmin = authUser.role === client_1.UserRole.ORGANIZATION_ADMIN;
     const isMember = authUser.role === client_1.UserRole.ORGANIZATION_MEMBER;
@@ -170,18 +173,22 @@ const updateIntoDB = async (authUser, id, payload) => {
         if (existingOrgId !== authOrgId) {
             throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Forbidden!");
         }
-        if (payload.organizationId && payload.organizationId !== existingOrgId) {
+        if (payload?.organizationId && payload.organizationId !== existingOrgId) {
             throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Org admin cannot change organizationId");
         }
-        if (payload.role === client_1.UserRole.PLATFORM_ADMIN) {
+        if (payload?.role === client_1.UserRole.PLATFORM_ADMIN) {
             throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "Forbidden!");
         }
     }
     // member can only update own name
     if (isMember) {
+        const updateData = {};
+        if (payload?.name !== undefined) {
+            updateData.name = payload.name;
+        }
         return prisma_1.prisma.user.update({
             where: { id },
-            data: { name: payload.name },
+            data: updateData,
             select: {
                 id: true,
                 email: true,
@@ -199,13 +206,28 @@ const updateIntoDB = async (authUser, id, payload) => {
         });
     }
     const existingOrgId = existing.organizationId ?? null;
+    // Build update data object with only provided fields
+    const updateData = {};
+    if (payload?.name !== undefined) {
+        updateData.name = payload.name;
+    }
+    if (payload?.role !== undefined) {
+        updateData.role = payload.role;
+    }
+    if (isPlatformAdmin) {
+        if (payload?.organizationId !== undefined) {
+            updateData.organizationId = payload.organizationId;
+        }
+        else {
+            updateData.organizationId = existingOrgId;
+        }
+    }
+    else {
+        updateData.organizationId = existingOrgId;
+    }
     return prisma_1.prisma.user.update({
         where: { id },
-        data: {
-            name: payload.name,
-            role: payload.role,
-            organizationId: isPlatformAdmin ? payload.organizationId ?? existingOrgId : existingOrgId,
-        },
+        data: updateData,
         select: {
             id: true,
             email: true,

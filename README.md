@@ -304,14 +304,39 @@ Server will start on `http://localhost:5000`
 
 ## 📮 Postman Collection
 
-Import the Postman collection (`postman_collection.json`) to test all endpoints:
+### Import Collection
 
-1. Import collection into Postman
-2. Login using test credentials (Platform Admin or Org Admin)
-3. Access token is automatically set in cookies
-4. Test endpoints according to role permissions
+1. **Download** `postman_collection.json` from the repository
+2. **Open Postman** → Click "Import" → Select the JSON file
+3. **Update Base URL** (if using deployed API):
+   - Click on collection name → Variables tab
+   - Update `baseUrl` variable with your deployed URL:
+     - For deployed: `https://multi-tenant-backend-one.vercel.app/api/v1`
+     - For local: `http://localhost:5000/api/v1`
 
-**Important**: The collection uses cookie-based authentication. Make sure "Automatically follow redirects" and "Send cookies with requests" are enabled in Postman settings.
+### Using the Collection
+
+1. **Login** using test credentials (Platform Admin or Org Admin)
+   - Use "Login - Platform Admin" or "Login - Org Admin (Org 1)" requests
+2. **Access token** is automatically stored in cookies
+3. **Test endpoints** according to role permissions
+4. All requests use the `{{baseUrl}}` variable automatically
+
+### Important Settings
+
+- **Cookie Management**: Postman automatically handles cookies
+- Enable "Send cookies with requests" in Postman settings
+- Enable "Automatically follow redirects" if needed
+
+### Test Credentials
+
+All test credentials use password: `Pass123!`
+
+- Platform Admin: `platform@admin.com`
+- Org 1 Admin: `admin@org1.com`
+- Org 1 Member: `member@org1.com`
+- Org 2 Admin: `admin@org2.com`
+- Org 2 Member: `member@org2.com`
 
 ## 🔧 Available Scripts
 

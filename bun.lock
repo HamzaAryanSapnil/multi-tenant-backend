@@ -4,7 +4,7 @@
     "": {
       "name": "multi-tenant-workspace-api",
       "dependencies": {
-        "bcryptjs": "^3.0.2",
+        "bcryptjs": "^3.0.3",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
         "dotenv": "^17.2.2",

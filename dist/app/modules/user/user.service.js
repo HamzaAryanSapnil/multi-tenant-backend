@@ -97,6 +97,13 @@ const getMe = async (authUser) => {
             organizationId: true,
             createdAt: true,
             updatedAt: true,
+            organization: {
+                select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                },
+            },
         },
     });
     return user;

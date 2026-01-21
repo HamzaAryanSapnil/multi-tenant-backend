@@ -8,7 +8,9 @@ import { OrganizationService } from "./organization.service";
 import { organizationFilterableFields } from "./organization.constant";
 
 const create = catchAsync(async (req: Request, res: Response) => {
+  console.log("req.body", req.body);
   const result = await OrganizationService.create(req.body);
+
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,

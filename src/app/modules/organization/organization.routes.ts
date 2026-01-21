@@ -8,12 +8,7 @@ import { OrganizationValidation } from "./organization.validation";
 
 const router = express.Router();
 
-router.post(
-  "/",
-  auth(UserRole.PLATFORM_ADMIN),
-  validateRequest(OrganizationValidation.createOrganizationValidationSchema),
-  OrganizationController.create,
-);
+
 
 router.get("/", auth(UserRole.PLATFORM_ADMIN), OrganizationController.getAllFromDB);
 
@@ -21,6 +16,13 @@ router.get(
   "/:id",
   auth(UserRole.PLATFORM_ADMIN),
   OrganizationController.getByIdFromDB,
+);
+
+router.post(
+  "/",
+  auth(UserRole.PLATFORM_ADMIN),
+  validateRequest(OrganizationValidation.createOrganizationValidationSchema),
+  OrganizationController.create,
 );
 
 router.patch(

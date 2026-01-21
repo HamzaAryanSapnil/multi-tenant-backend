@@ -3,7 +3,7 @@ import z from "zod";
 
 const createUserValidationSchema = z.object({
   body: z.object({
-    email: z.string().email("Valid email is required"),
+    email: z.email("Valid email is required"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     name: z.string().optional(),
     role: z.enum([
@@ -12,7 +12,7 @@ const createUserValidationSchema = z.object({
       UserRole.PLATFORM_ADMIN,
     ]),
     // Platform admin may pass organizationId; org admin's orgId will be enforced from token.
-    organizationId: z.string().uuid().optional().nullable(),
+    organizationId: z.uuid().optional().nullable(),
   }),
 });
 
@@ -22,7 +22,7 @@ const updateUserValidationSchema = z.object({
     role: z
       .enum([UserRole.ORGANIZATION_ADMIN, UserRole.ORGANIZATION_MEMBER])
       .optional(),
-    organizationId: z.string().uuid().optional().nullable(),
+    organizationId: z.uuid().optional().nullable(),
   }),
 });
 

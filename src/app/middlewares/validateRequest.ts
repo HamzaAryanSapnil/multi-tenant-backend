@@ -5,7 +5,8 @@ const validateRequest =
   (schema: ZodSchema) =>
   (req: Request, _res: Response, next: NextFunction) => {
     try {
-      req.body = schema.parse(req.body);
+      const parsed = schema.parse({ body: req.body }) as any;
+      req.body = parsed.body;
       next();
     } catch (error) {
       next(error);

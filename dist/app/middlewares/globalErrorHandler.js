@@ -5,48 +5,75 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
+const zod_1 = require("zod");
 const globalErrorHandler = (err, req, res, next) => {
     console.log(err);
     let statusCode = err.statusCode || http_status_1.default.INTERNAL_SERVER_ERROR;
     let success = false;
     let message = err.message || "Something went wrong!";
     let error = err;
-    if (err instanceof client_1.Prisma.PrismaClientKnownRequestError) {
+    // Zod Validation Errors
+    if (err instanceof zod_1.ZodError) {
+        statusCode = http_status_1.default.BAD_REQUEST;
+        const errors = err.issues.map((issue) => ({
+            path: issue.path.join("."),
+            message: issue.message,
+        }));
+        message = "Validation failed";
+        error = { errors };
+    }
+    // Prisma Known Request Errors
+    else if (err instanceof client_1.Prisma.PrismaClientKnownRequestError) {
         if (err.code === "P2002") {
-            message = "Duplicate key error",
-                error = err.meta,
-                statusCode = http_status_1.default.CONFLICT;
+            const field = err.meta?.target?.join(", ") || "field";
+            message = `Duplicate value for ${field}. This ${field} already exists.`;
+            error = { field, code: err.code };
+            statusCode = http_status_1.default.CONFLICT;
         }
-        if (err.code === "P1000") {
-            message = "Authentication failed against database server",
-                error = err.meta,
-                statusCode = http_status_1.default.BAD_GATEWAY;
+        else if (err.code === "P2025") {
+            message = "Record not found. The requested resource does not exist.";
+            error = { code: err.code };
+            statusCode = http_status_1.default.NOT_FOUND;
         }
-        if (err.code === "P2003") {
-            message = "Foreign key constraint failed",
-                error = err.meta,
-                statusCode = http_status_1.default.BAD_REQUEST;
+        else if (err.code === "P2003") {
+            const field = err.meta?.field_name || "field";
+            message = `Invalid ${field}. Related record does not exist.`;
+            error = { field, code: err.code };
+            statusCode = http_status_1.default.BAD_REQUEST;
+        }
+        else if (err.code === "P1000") {
+            message = "Database authentication failed. Please check database credentials.";
+            error = { code: err.code };
+            statusCode = http_status_1.default.BAD_GATEWAY;
+        }
+        else {
+            message = "Database operation failed.";
+            error = { code: err.code, meta: err.meta };
+            statusCode = http_status_1.default.BAD_REQUEST;
         }
     }
+    // Prisma Validation Errors
     else if (err instanceof client_1.Prisma.PrismaClientValidationError) {
-        message = "Validation Error",
-            error = err.message,
-            statusCode = http_status_1.default.BAD_REQUEST;
+        message = "Invalid data provided. Please check your input.";
+        error = { details: "Validation error in database query" };
+        statusCode = http_status_1.default.BAD_REQUEST;
     }
+    // Prisma Unknown Request Errors
     else if (err instanceof client_1.Prisma.PrismaClientUnknownRequestError) {
-        message = "Unknown Prisma error occured!",
-            error = err.message,
-            statusCode = http_status_1.default.BAD_REQUEST;
+        message = "An unexpected database error occurred.";
+        error = { details: err.message };
+        statusCode = http_status_1.default.INTERNAL_SERVER_ERROR;
     }
+    // Prisma Initialization Errors
     else if (err instanceof client_1.Prisma.PrismaClientInitializationError) {
-        message = "Prisma client failed to initialize!",
-            error = err.message,
-            statusCode = http_status_1.default.BAD_REQUEST;
+        message = "Database connection failed. Please try again later.";
+        error = { details: "Failed to initialize database client" };
+        statusCode = http_status_1.default.SERVICE_UNAVAILABLE;
     }
     res.status(statusCode).json({
         success,
         message,
-        error
+        error,
     });
 };
 exports.default = globalErrorHandler;

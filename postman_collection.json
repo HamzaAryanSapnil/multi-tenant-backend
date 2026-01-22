@@ -7,7 +7,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "https://multi-tenant-backend-one.vercel.app/api/v1",
+      "value": "https://multi-tenant-backend-two.vercel.app/api/v1",
       "type": "string",
       "description": "Update this with your deployed API URL. For local testing, use: http://localhost:5000/api/v1"
     }
@@ -128,7 +128,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Acme Corporation\",\n  \"description\": \"Leading technology company\"\n}"
+              "raw": "{\n  \"name\": \"Multi Tenant\",\n  \"description\": \"Multi Tenant Workspace Company\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/organizations",
@@ -188,7 +188,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "org-uuid-here"
+                  "value": "8f3cfb72-3ce1-46fe-a3db-85250cce5817"
                 }
               ]
             },
@@ -217,7 +217,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "org-uuid-here"
+                  "value": "8f3cfb72-3ce1-46fe-a3db-85250cce5817"
                 }
               ]
             },
@@ -237,7 +237,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "org-uuid-here"
+                  "value": "3fa6ccbe-799a-4473-8302-6ec2a6d5ef71"
                 }
               ]
             },
@@ -263,7 +263,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"newuser@org1.com\",\n  \"password\": \"Pass123!\",\n  \"name\": \"John Doe\",\n  \"role\": \"ORGANIZATION_MEMBER\"\n}"
+              "raw": "{\n  \"email\": \"newuser@org5.com\",\n  \"password\": \"Pass123!\",\n  \"name\": \"John Doe\",\n  \"role\": \"ORGANIZATION_MEMBER\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/users",
@@ -342,7 +342,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "user-uuid-here"
+                  "value": "2d1e364d-593f-4d1f-9275-35cd2d137919"
                 }
               ]
             },
@@ -371,7 +371,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "user-uuid-here"
+                  "value": "2d1e364d-593f-4d1f-9275-35cd2d137919"
                 }
               ]
             },
@@ -391,7 +391,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "user-uuid-here"
+                  "value": "adfb5a69-fb13-49ba-9129-cc5217832812"
                 }
               ]
             },
@@ -414,11 +414,11 @@
                 "key": "Content-Type",
                 "value": "application/json"
               }
-            ],
+            ], 
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Website Redesign\",\n  \"description\": \"Complete redesign of company website\"\n}"
-            },
+      "mode": "raw",
+      "raw": "{\n  \"name\": \"Multi Tenant\",\n  \"description\": \"Complete redesign of company website\",\n  \"organizationId\": \"7af17b1e-6e58-4b65-a9a5-c21f557b4007\"  // Required if logged in as Platform Admin. Organization Admin can omit it (auto from token).\n}"
+    },
             "url": {
               "raw": "{{baseUrl}}/projects",
               "host": ["{{baseUrl}}"],
@@ -477,7 +477,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "project-uuid-here"
+                  "value": "75351a2c-9421-473a-9f92-6f706918d40d"
                 }
               ]
             },
@@ -506,7 +506,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "project-uuid-here"
+                  "value": "75351a2c-9421-473a-9f92-6f706918d40d"
                 }
               ]
             },
@@ -526,7 +526,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "project-uuid-here"
+                  "value": "1002312a-98c8-4429-835a-f1a15d8bd5de"
                 }
               ]
             },
@@ -552,7 +552,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Design homepage mockup\",\n  \"description\": \"Create high-fidelity mockup for new homepage\",\n  \"status\": \"TODO\",\n  \"projectId\": \"project-uuid-here\"\n}"
+              "raw": "{\n  \"title\": \"Design homepage mockup\",\n  \"description\": \"Create high-fidelity mockup for new homepage\",\n  \"status\": \"TODO\",\n  \"projectId\": \"75351a2c-9421-473a-9f92-6f706918d40d\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/tasks",
@@ -622,7 +622,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "task-uuid-here"
+                  "value": "79ed656a-8559-4828-ae20-754f3bc58103"
                 }
               ]
             },
@@ -651,7 +651,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "task-uuid-here"
+                  "value": "79ed656a-8559-4828-ae20-754f3bc58103"
                 }
               ]
             },
@@ -671,7 +671,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "task-uuid-here"
+                  "value": "6a28f7bb-3c68-4420-9519-79438b94b71d"
                 }
               ]
             },
@@ -691,7 +691,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": \"user-uuid-here\"\n}"
+              "raw": "{\n  \"userId\": \"2d1e364d-593f-4d1f-9275-35cd2d137919\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/tasks/:id/assign",
@@ -700,7 +700,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "task-uuid-here"
+                  "value": "79ed656a-8559-4828-ae20-754f3bc58103"
                 }
               ]
             },
@@ -720,11 +720,11 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "task-uuid-here"
+                  "value": "79ed656a-8559-4828-ae20-754f3bc58103"
                 },
                 {
                   "key": "userId",
-                  "value": "user-uuid-here"
+                  "value": "2d1e364d-593f-4d1f-9275-35cd2d137919"
                 }
               ]
             },

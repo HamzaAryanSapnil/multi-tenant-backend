@@ -203,6 +203,8 @@ const users = await prisma.user.findMany({
 
 ## 🚀 API Endpoints
 
+### Base Url: https://multi-tenant-backend-two.vercel.app
+
 ### Authentication
 - `POST /api/v1/auth/login` - Login (returns JWT in cookies)
 - `GET /api/v1/auth/me` - Get current user profile
@@ -249,7 +251,7 @@ const users = await prisma.user.findMany({
 
 1. **Clone the repository**
 ```bash
-git clone <repository-url>
+git clone <https://github.com/HamzaAryanSapnil/multi-tenant-backend>
 cd backend
 ```
 
@@ -311,7 +313,7 @@ Server will start on `http://localhost:5000`
 3. **Update Base URL** (if using deployed API):
    - Click on collection name → Variables tab
    - Update `baseUrl` variable with your deployed URL:
-     - For deployed: `https://multi-tenant-backend-one.vercel.app/api/v1`
+     - For deployed: `https://multi-tenant-backend-two.vercel.app/api/v1`
      - For local: `http://localhost:5000/api/v1`
 
 ### Using the Collection

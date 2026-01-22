@@ -12,6 +12,7 @@ const create = async (
   payload: { name: string; description?: string; organizationId?: string },
 ): Promise<Project> => {
   let organizationId = payload.organizationId;
+  console.log("organizationId", organizationId);
 
   // Org Admin/Member must use their own organizationId
   if (user.role !== UserRole.PLATFORM_ADMIN) {

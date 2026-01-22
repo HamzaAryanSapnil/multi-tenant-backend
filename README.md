@@ -28,7 +28,7 @@ While MongoDB could work for flexible schemas, the relational nature of our data
 ## 🏗️ Data Models & Relationships
 
 ### Entity Relationship Diagram
-
+![ERD](https://i.ibb.co.com/dwBSrPXY/ER-Diagram.png)
 ```
 ┌─────────────────┐
 │  Organization   │
@@ -81,6 +81,25 @@ While MongoDB could work for flexible schemas, the relational nature of our data
                │ assignedAt          │
                └─────────────────────┘
 ```
+## 🧪 Test Credentials (After Seeding)
+
+### Platform Admin
+- Email: `platform@admin.com`
+- Password: `Pass123!`
+
+### Organization 1
+- **Org Admin**
+  - Email: `admin@org1.com`
+  - Password: `Pass123!`
+- **Member**
+  - Email: `member@org1.com`
+  - Password: `Pass123!`
+
+### Organization 2
+- **Org Admin**
+  - Email: `admin@org2.com`
+  - Password: `Pass123!`
+
 
 ### Tables
 
@@ -282,25 +301,6 @@ npm run dev
 ```
 
 Server will start on `http://localhost:5000`
-
-## 🧪 Test Credentials (After Seeding)
-
-### Platform Admin
-- Email: `platform@admin.com`
-- Password: `Pass123!`
-
-### Organization 1
-- **Org Admin**
-  - Email: `admin@org1.com`
-  - Password: `Pass123!`
-- **Member**
-  - Email: `member@org1.com`
-  - Password: `Pass123!`
-
-### Organization 2
-- **Org Admin**
-  - Email: `admin@org2.com`
-  - Password: `Pass123!`
 
 ## 📮 Postman Collection
 

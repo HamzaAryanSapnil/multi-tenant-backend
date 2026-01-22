@@ -6,7 +6,7 @@ const createProjectSchema = z.object({
       message: "Project name is required",
     }),
     description: z.string().optional(),
-    organizationId: z.string().uuid().optional(), // Platform Admin can specify; Org Admin uses their own
+    organizationId: z.uuid().optional(), // Platform Admin can specify; Org Admin uses their own
   }),
 });
 
